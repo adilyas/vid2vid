@@ -38,7 +38,7 @@ class FaceDataset(BaseDataset):
         is_first_frame = self.opt.isTrain or not hasattr(self, 'min_x')
         if is_first_frame: # crop only the face region
             self.get_crop_coords(points, B_size)
-        params = get_img_params(self.opt, self.crop(B_img).size)        
+        params = get_img_params(self.opt, self.crop(B_img).size, self.min_x, self.min_y)        
         transform_scaleA = get_transform(self.opt, params, method=Image.BILINEAR, normalize=False)
         transform_label = get_transform(self.opt, params, method=Image.NEAREST, normalize=False)
         transform_scaleB = get_transform(self.opt, params)

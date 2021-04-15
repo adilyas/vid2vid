@@ -82,7 +82,7 @@ class BaseDataset(data.Dataset):
 def make_power_2(n, base=32.0):    
     return int(round(n / base) * base)
 
-def get_img_params(opt, size):
+def get_img_params(opt, size, crop_x, crop_y):
     w, h = size
     new_h, new_w = h, w        
     if 'resize' in opt.resize_or_crop:   # resize image to be loadSize x loadSize
@@ -102,7 +102,7 @@ def get_img_params(opt, size):
     new_w = int(round(new_w / 4)) * 4
     new_h = int(round(new_h / 4)) * 4    
 
-    crop_x = crop_y = 0
+    # crop_x = crop_y = 0
     crop_w = crop_h = 0
     if 'crop' in opt.resize_or_crop or 'scaledCrop' in opt.resize_or_crop:
         if 'crop' in opt.resize_or_crop:      # crop patches of size fineSize x fineSize
@@ -117,8 +117,8 @@ def get_img_params(opt, size):
 
         crop_w, crop_h = make_power_2(crop_w), make_power_2(crop_h)        
         x_span = (new_w - crop_w) // 2
-        crop_x = np.maximum(0, np.minimum(x_span*2, int(np.random.randn() * x_span/3 + x_span)))        
-        crop_y = random.randint(0, np.minimum(np.maximum(0, new_h - crop_h), new_h // 8))
+        # crop_x = np.maximum(0, np.minimum(x_span*2, int(np.random.randn() * x_span/3 + x_span)))        
+        # crop_y = random.randint(0, np.minimum(np.maximum(0, new_h - crop_h), new_h // 8))
         #crop_x = random.randint(0, np.maximum(0, new_w - crop_w))
         #crop_y = random.randint(0, np.maximum(0, new_h - crop_h))        
     else:

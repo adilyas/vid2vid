@@ -33,10 +33,23 @@ def train():
         start_epoch, epoch_iter, print_freq, total_steps, iter_path = init_params(opt, modelG, modelD, data_loader)
     visualizer = Visualizer(opt)    
 
+    dataset_iterator = enumerate(dataset, start=1)
+    dataset_empty = False
+
     ### real training starts here  
     for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
+        if dataset_empty:
+            break
+
         epoch_start_time = time.time()    
-        for idx, data in enumerate(dataset, start=epoch_iter):        
+
+        while True:
+            try:
+                idx, data = next(dataset_iterator)
+            except:
+                dataset_empty = True
+                break
+
             if total_steps % print_freq == 0:
                 iter_start_time = time.time()
             total_steps += opt.batchSize
@@ -116,6 +129,9 @@ def train():
             save_models(opt, epoch, epoch_iter, total_steps, visualizer, iter_path, modelG, modelD)            
             if epoch_iter > dataset_size - opt.batchSize:
                 epoch_iter = 0
+                break
+
+            if idx % 100 == 0:
                 break
            
         # end of epoch 

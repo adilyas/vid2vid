@@ -4,6 +4,7 @@ import time
 import os
 import torch
 from subprocess import call
+from random import randint
 
 from options.train_options import TrainOptions
 from data.data_loader import CreateDataLoader
@@ -66,8 +67,8 @@ def train():
                 samples.append(((input_A, inst_A), input_B))
                 samples = samples[-2:]
 
-                input_A, inst_A = samples[randint(0, 1)][0]
-                input_B = samples[randint(0, 1)][1]
+                input_A, inst_A = samples[randint(0, len(samples) - 1)][0]
+                input_B = samples[randint(0, len(samples) - 1)][1]
                 
                 ###################################### Forward Pass ##########################
                 ####### generator                  

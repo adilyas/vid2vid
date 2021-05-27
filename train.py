@@ -35,6 +35,7 @@ def train():
 
     dataset_iterator = enumerate(dataset, start=1)
     dataset_empty = False
+    samples = []
 
     ### real training starts here  
     for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
@@ -62,6 +63,11 @@ def train():
 
             for i in range(0, n_frames_total, n_frames_load):
                 input_A, input_B, inst_A = data_loader.dataset.prepare_data(data, i, input_nc, output_nc)
+                samples.append(((input_A, inst_A), input_B))
+                samples = samples[-2:]
+
+                input_A, inst_A = samples[randint(0, 1)][0]
+                input_B = samples[randint(0, 1)][1]
                 
                 ###################################### Forward Pass ##########################
                 ####### generator                  

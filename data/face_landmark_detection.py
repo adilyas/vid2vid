@@ -6,12 +6,12 @@ import dlib
 import sys
 
 if len(sys.argv) < 2 or (sys.argv[1] != 'train' and sys.argv[1] != 'test'):
-    raise ValueError('usage: python data/face_landmark_detection.py [train|test]')
+    raise ValueError('usage: python data/face_landmark_detection.py [train|test] [dataset_path]')
 
 phase = sys.argv[1]
-dataset_path = 'datasets/face/'
+dataset_path = sys.argv[2]
 faces_folder_path = os.path.join(dataset_path, phase + '_img/')
-predictor_path = os.path.join(dataset_path, 'shape_predictor_68_face_landmarks.dat')
+predictor_path = os.path.join('datasets/face/', 'shape_predictor_68_face_landmarks.dat')
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(predictor_path)
 

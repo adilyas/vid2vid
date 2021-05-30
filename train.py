@@ -11,6 +11,8 @@ from models.models import create_model, create_optimizer, init_params, save_mode
 import util.util as util
 from util.visualizer import Visualizer
 
+EPOCH_SIZE = 100
+
 def train():
     opt = TrainOptions().parse()
     if opt.debug:
@@ -44,10 +46,15 @@ def train():
         epoch_start_time = time.time()    
 
         while True:
-            try:
-                idx, data = next(dataset_iterator)
-            except:
-                dataset_empty = True
+            while True:
+                try:
+                    idx, data = next(dataset_iterator)
+                except:
+                    if dataset_size == 0:
+                        dataset_empty = True
+                        break
+                    dataset_iterator = enumerate(data_loader.load_data(), start=idx + 1)
+            if dataset_empty:
                 break
 
             if total_steps % print_freq == 0:
@@ -131,7 +138,7 @@ def train():
                 epoch_iter = 0
                 break
 
-            if idx % 100 == 0:
+            if idx % EPOCH_SIZE == 0:
                 break
            
         # end of epoch 

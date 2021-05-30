@@ -160,7 +160,7 @@ class FaceDataset(BaseDataset):
         min_y, max_y = keypoints[:,1].min(), keypoints[:,1].max()
         min_x, max_x = keypoints[:,0].min(), keypoints[:,0].max()                
         xc = (min_x + max_x) // 2
-        yc = (min_y*3 + max_y) // 4
+        yc = (min_y + max_y) // 2
         h = w = max(max_x - min_x, max_y - min_y) * 1.2
         xc = min(max(0, xc - w//2) + w, size[0]) - w//2
         yc = min(max(0, yc - h//2) + h, size[1]) - h//2

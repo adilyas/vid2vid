@@ -49,6 +49,7 @@ def train():
             while True:
                 try:
                     idx, data = next(dataset_iterator)
+                    break
                 except:
                     if dataset_size == 0:
                         dataset_empty = True
@@ -138,7 +139,7 @@ def train():
                 epoch_iter = 0
                 break
 
-            if idx % EPOCH_SIZE == 0:
+            if idx % (EPOCH_SIZE // opt.batchSize) == 0:
                 break
            
         # end of epoch 

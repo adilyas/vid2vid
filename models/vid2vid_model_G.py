@@ -274,8 +274,8 @@ class Vid2VidModelG(BaseModel):
                 netG = networks.define_G(35, 3, 0, 32, 'local', 4, 'instance', 0, self.gpu_ids, opt)
             else:
                 raise ValueError('Single image generator does not exist')
-        elif 'face' in self.opt.dataroot:            
-            single_path = 'checkpoints/edge2face_single/'
+        elif 'face' in self.opt.dataroot or self.opt.dataset_mode == 'face':
+            single_path = os.path.join(self.opt.checkpoints_dir, 'edge2face_single/')
             load_path = single_path + 'latest_net_G.pth' 
             opt.feat_num = 16           
             netG = networks.define_G(15, 3, 0, 64, 'global_with_features', 3, 'instance', 0, self.gpu_ids, opt)
@@ -292,8 +292,8 @@ class Vid2VidModelG(BaseModel):
         #if self.opt.use_encoded_image:
         #    return feat_map
         
-        if not self.no_feature_nn:
-            load_name = 'checkpoints/edge2face_single/features.npy'
+        if not self.opt.no_feature_nn:
+            load_name = os.path.join(self.opt.checkpoints_dir, 'edge2face_single/features.npy')
             features = np.load(load_name, encoding='latin1').item()                        
             inst_np = inst.cpu().numpy().astype(int)
 

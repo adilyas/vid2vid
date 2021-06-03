@@ -280,7 +280,7 @@ class Vid2VidModelG(BaseModel):
             opt.feat_num = 16           
             netG = networks.define_G(15, 3, 0, 64, 'global_with_features', 3, 'instance', 0, self.gpu_ids, opt)
             encoder_path = single_path + 'latest_net_E.pth'
-            self.netE = networks.define_G(3, 16, 0, 16, 'encoder', 4, 'instance', 0, self.gpu_ids)
+            self.netE = networks.define_G(3, self.opt.feat_num, 0, 16, 'encoder', 4, 'instance', 0, self.gpu_ids)
             self.netE.load_state_dict(torch.load(encoder_path))
         else:
             raise ValueError('Single image generator does not exist')
@@ -292,32 +292,35 @@ class Vid2VidModelG(BaseModel):
         #if self.opt.use_encoded_image:
         #    return feat_map
         
-        load_name = 'checkpoints/edge2face_single/features.npy'
-        features = np.load(load_name, encoding='latin1').item()                        
-        inst_np = inst.cpu().numpy().astype(int)
+        if not self.no_feature_nn:
+            load_name = 'checkpoints/edge2face_single/features.npy'
+            features = np.load(load_name, encoding='latin1').item()                        
+            inst_np = inst.cpu().numpy().astype(int)
 
-        # find nearest neighbor in the training dataset
-        num_images = features[6].shape[0]
-        feat_map = feat_map.data.cpu().numpy()
-        feat_ori = torch.FloatTensor(7, self.opt.feat_num, 1) # feature map for test img (for each facial part)
-        feat_ref = torch.FloatTensor(7, self.opt.feat_num, num_images) # feature map for training imgs
-        for label in np.unique(inst_np):
-            idx = (inst == int(label)).nonzero() 
-            for k in range(self.opt.feat_num): 
-                feat_ori[label,k] = float(feat_map[idx[0,0], idx[0,1] + k, idx[0,2], idx[0,3]])
-                for m in range(num_images):
-                    feat_ref[label,k,m] = features[label][m,k]                
-        cluster_idx = self.dists_min(feat_ori.expand_as(feat_ref).cuda(), feat_ref.cuda(), num=1)
+            # find nearest neighbor in the training dataset
+            num_images = features[6].shape[0]
+            feat_map = feat_map.data.cpu().numpy()
+            feat_ori = torch.FloatTensor(7, self.opt.feat_num, 1) # feature map for test img (for each facial part)
+            feat_ref = torch.FloatTensor(7, self.opt.feat_num, num_images) # feature map for training imgs
+            for label in np.unique(inst_np):
+                idx = (inst == int(label)).nonzero() 
+                for k in range(self.opt.feat_num): 
+                    feat_ori[label,k] = float(feat_map[idx[0,0], idx[0,1] + k, idx[0,2], idx[0,3]])
+                    for m in range(num_images):
+                        feat_ref[label,k,m] = features[label][m,k]                
+            cluster_idx = self.dists_min(feat_ori.expand_as(feat_ref).cuda(), feat_ref.cuda(), num=1)
 
-        # construct new feature map from nearest neighbors
-        feat_map = self.Tensor(inst.size()[0], self.opt.feat_num, inst.size()[2], inst.size()[3])
-        for label in np.unique(inst_np):
-            feat = features[label][:,:-1]                                                    
-            idx = (inst == int(label)).nonzero()                
-            for k in range(self.opt.feat_num):                    
-                feat_map[idx[:,0], idx[:,1] + k, idx[:,2], idx[:,3]] = feat[min(cluster_idx, feat.shape[0]-1), k]
+            # construct new feature map from nearest neighbors
+            feat_map = self.Tensor(inst.size()[0], self.opt.feat_num, inst.size()[2], inst.size()[3])
+            for label in np.unique(inst_np):
+                feat = features[label][:,:-1]                                                    
+                idx = (inst == int(label)).nonzero()                
+                for k in range(self.opt.feat_num):                    
+                    feat_map[idx[:,0], idx[:,1] + k, idx[:,2], idx[:,3]] = feat[min(cluster_idx, feat.shape[0]-1), k]
         
-        return Variable(feat_map)
+            feat_map = Variable(feat_map)
+
+        return feat_map
 
     def compute_mask(self, real_As, ts, te=None): # compute the mask for foreground objects
         _, _, _, h, w = real_As.size() 

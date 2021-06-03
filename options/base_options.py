@@ -67,6 +67,7 @@ class BaseOptions():
         self.parser.add_argument('--no_canny_edge', action='store_true', help='do *not* use canny edge as input')
         self.parser.add_argument('--no_dist_map', action='store_true', help='do *not* use distance transform map as input')
         self.parser.add_argument('--random_scale_points', action='store_true', help='randomly scale face keypoints a bit to create different results')
+        self.parser.add_argument('--no_feature_nn', action='store_true', help='disable features nearest neighbour search')
 
         # pose specific
         self.parser.add_argument('--densepose_only', action='store_true', help='use only densepose as input')

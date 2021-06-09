@@ -52,3 +52,4 @@ RUN python data/face_landmark_detection.py train
 RUN pip3 install numpy==1.16.0
 
 RUN git clone https://github.com/adilyas/pix2pixHD /pix2pixHD2
+RUN apt-get install ffmpeg -y

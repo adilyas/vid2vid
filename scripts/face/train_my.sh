@@ -1,0 +1,1 @@
+python train.py --name edge2face_512 --dataroot /vid2vid/dataset --dataset_mode face --input_nc 15 --loadSize 256 --num_D 3 --gpu_ids 0,1 --n_gpus_gen 1 --n_frames_total 12 --checkpoints_dir /vid2vid/checkpoints --no_canny_edge
